@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head th:replace="~{base :: head}"></head>
+
+<body onload="onload()"> 
+
+	<div th:replace="~{base :: logo}"></div>
+
+	<div class="container" id="ofertas">
+	
+	 	<div th:replace="~{base :: titulo('Faça sua Oferta')}"></div> 
+
+		<div class="card mb-2 mt-2" v-for="pedido in pedidos">
+		
+			<!--
+				<th:block th:switch="${pedido.status.name()}">
+				
+					<div th:case="'AGUARDANDO'" class="card-header alert-warning" th:text="${pedido.nomeProduto}">Nome do produto</div>
+					<div th:case="'APROVADO'" class="card-header alert-success" th:text="${pedido.nomeProduto}">Nome do produto</div>
+					<div th:case="'ENTREGUE'" class="card-header alert-dark" th:text="${pedido.nomeProduto}">Nome do produto</div>
+				
+				</th:block>  
+			-->
+			
+			<div class="card-header alert-warning">{{pedido.nomeProduto}}</div>
+			
+
+			<div class="card-body">
+				<div class="row"> 
+					<div class="col-12 col-sm-8 mb-3">  
+						<div class="mt-1 mb-1">
+							<label>Produto:</label> 
+							<a v-bind:href="pedido.urlProduto" target="_blank">{{pedido.nomeProduto}}</a>
+						</div>
+						 
+						<div class="mt-1 mb-1">
+							<label>Descrição:</label>
+							<textarea disabled="disabled" class="form-control" rows="4">{{pedido.descricao}}"</textarea>
+						</div>
+					</div>
+
+					<div class="col-12 col-sm-4">
+						<div>
+							<img class="img-thumbnail" alt="" :src="pedido.urlImagem"
+								width="100%">
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-12 col-sm-8">
+							<div class="row">
+							
+								<div class="col-md-6">
+									<div>
+										<label>Valor:</label> 
+										<input type="number" v-bind:class="{'is-invalid':pedido.erros.valor !==''}" class="form-control"
+											v-model="pedido.valorNegociado">
+										<div v-if="pedido.erros.valor" class="invalid-feedback" style="text-transform: capitalize;">{{pedido.erros.valor}}</div>
+									</div>
+								</div>
+		
+								<div class="col-md-6">
+									<div>
+										<label>Data da entrega:</label> 
+										<input type="text"
+											v-bind:class="{'is-invalid':pedido.erros.dataDaEntrega !==''}" class="form-control" v-model="pedido.dataDaEntrega">
+										<div v-if="pedido.erros.dataDaEntrega" class="invalid-feedback" style="text-transform: capitalize;">{{pedido.erros.dataDaEntrega}}</div>
+											
+									</div>
+								</div> 
+								
+								<div class="col-12 col-sm-12">
+									<label>Comentário:</label>
+									<textarea v-model="pedido.comentario" class="form-control"
+										rows="4"></textarea>
+								</div> 
+							</div>
+							<button v-if="pedido.ofertaEnviada" type="submit" class="form-control btn-success mt-2 mb-2 w-25">Oferta Enviada</button>
+							<button v-else v-on:click="enviarOferta(pedido)" type="submit" class="form-control btn-info mt-2 mb-2 w-25">Enviar Oferta</button>
+						</div>
+					</div>
+					
+					
+ 
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		function onload(){
+			var app = new Vue({
+				el : "#ofertas",
+				data : {
+					pedidos :  []
+						   
+				},
+				mounted () {
+					axios
+					  .get('http://localhost:8080/api/pedidos/aguardando')
+					  .then((response) => {
+						  response.data.forEach(pedido => {
+							  pedido.ofertaEnviada = false;
+							  pedido.erros = {
+								valor: '',
+								dataDaEntrega: ''
+							  }
+						  })
+						  this.pedidos = response.data 
+					  });
+				},
+				methods: {
+					enviarOferta: function(pedido){  
+						pedido.erros = {
+							valor: '',
+							dataDaEntrega: ''
+						  };
+						
+						axios
+						  .post('http://localhost:8080/api/ofertas', { 
+							  pedidoId: pedido.id, 
+							  valor: pedido.valorNegociado, 
+							  dataDaEntrega: pedido.dataDaEntrega, 
+							  comentario: pedido.comentario 
+							  })
+						  .then((response) => pedido.ofertaEnviada = true)
+						  .catch(error => { 
+								error.response.data.errors.forEach(error => { 
+									pedido.erros[error.field] = error.defaultMessage;
+								})
+						  })
+					}
+				}
+			});
+		}
+	</script> 
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

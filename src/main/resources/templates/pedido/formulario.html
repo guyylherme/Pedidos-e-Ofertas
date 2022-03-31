@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+
+	<div th:replace="~{base :: logo}"></div>
+
+	<div class="container">
+	
+		<div th:replace="~{base :: titulo('Novo Pedido')}"></div> 
+
+		<div class="card"> 
+
+			<div class="card-body"> 
+				<form th:object="${requisicaoNovoPedido}" class="card-body" th:action="@{/pedido/novo}" method="POST"> 
+					<div class="mb-2">
+						<label for="nomeProduto">Produto:</label>
+						<input th:field="*{nome}" th:errorclass="is-invalid" class="form-control" placeholder="Nome do produto"/>
+						<div th:errors="*{nome}" class="invalid-feedback" style="text-transform: capitalize;"></div>
+					</div> 
+					
+					<div class="mb-2">
+						<label for="urlProduto">Url:</label>
+						<input th:field="*{url}" th:errorclass="is-invalid" class="form-control" name="url" placeholder="Url do produto"/>
+						<div th:errors="*{url}" class="invalid-feedback" style="text-transform: capitalize;"></div>
+					</div> 
+					
+					<div class="mb-2">
+						<label for="imagemProduto">Imagem:</label>
+						<input th:field="*{imagem}" th:errorclass="is-invalid" class="form-control" name="imagem" placeholder="Imagem do produto"/>
+						<div th:errors="*{imagem}" class="invalid-feedback" style="text-transform: capitalize;"></div>
+					</div>
+					
+					<div class="mb-2">
+						<label for="descricaoProduto">Descriçao:</label>
+						<textarea th:field="*{descricao}" th:errorclass="is-invalid" class="form-control" name="descricao" placeholder="Descrição do produto"> </textarea>
+						<div th:errors="*{descricao}" class="invalid-feedback" style="text-transform: capitalize;"></div>
+					</div> 
+					
+					<button type="submit" class="form-control btn-success mt-4">Salvar</button>
+				
+				</form> 
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>
